@@ -47,6 +47,17 @@ A window will open where you can load your OSL JSON files.
 
 ---
 
+## 🚀 Run the Installer
+
+```bash
+pip install pyinstaller
+```
+
+pyinstaller --onefile --windowed main.py
+
+
+---
+
 ## 📄 License
 
 This project is open source and free to use under the MIT License.
