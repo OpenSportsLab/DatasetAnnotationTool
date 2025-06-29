@@ -24,7 +24,7 @@ conda activate osl-visualizer
 ### Step 2 – Install dependencies
 
 ```bash
-pip install PyQt5
+pip install pyqt6
 ```
 
 Optionally, if you plan to add video rendering or computer vision:
