@@ -40,14 +40,25 @@ pip install opencv-python
 From the root of the project folder, launch the app with:
 
 ```bash
-python main.py
+python osl_visualizer/main.py
 ```
 
 A window will open where you can load your OSL JSON files.
 
+
+Tips: Download a dataset from HF and run the app with that dataset
+```bash
+python tools/download_osl_hf.py \
+--url https://huggingface.co/datasets/OpenSportsLab/HistWC/blob/main/HistWC-finals.json \
+--output-dir /Users/giancos/Documents/HistWC/
+python osl_visualizer/main.py --osl_file /Users/giancos/Documents/HistWC/HistWC-finals.json
+```
+
 ---
 
 ## 🚀 Run the Installer
+
+This script is automatically called whenever you push to Github
 
 ```bash
 pip install pyinstaller
