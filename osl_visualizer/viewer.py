@@ -20,6 +20,22 @@ logging.basicConfig(
     format='%(asctime)s %(levelname)s:%(message)s',
     handlers=[logging.StreamHandler()]
 )
+from PyQt6 import uic
+from PyQt6.QtWidgets import QDialog
+from PyQt6.QtCore import QSettings
+
+class ConfigDialog(QDialog):
+    def __init__(self, parent=None, current_jump_before=5000):
+        super().__init__(parent)
+        # uic.loadUi("ui/configdialog.ui", self)
+        uic.loadUi(os.path.join(os.path.dirname(__file__), "ui/configdialog.ui"), self)
+
+        self.jumpBeforeSpinBox.setValue(current_jump_before)
+        self.okButton.clicked.connect(self.accept)
+        self.cancelButton.clicked.connect(self.reject)
+
+    def get_jump_before(self):
+        return self.jumpBeforeSpinBox.value()
 
 class DatasetViewer(QMainWindow):
     def __init__(self):
@@ -43,6 +59,7 @@ class DatasetViewer(QMainWindow):
         self.available_labels = []
         self.current_video_info = None
         self._updating_selection = False
+        self.jump_before_ms = 5000
 
         self.player = QMediaPlayer(self)
         self.audio_output = QAudioOutput(self)
@@ -71,6 +88,10 @@ class DatasetViewer(QMainWindow):
         self.forwardFrameButton.clicked.connect(lambda: self.step_frame(1))
         self.addAnnotationButton.clicked.connect(self.add_annotation_at_current_time)
         self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
+        self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
+
+
+        self.load_settings()
 
 
 
@@ -169,7 +190,7 @@ class DatasetViewer(QMainWindow):
         else:
             self.metadataTextEdit.setText("")
 
-        jump_to = max(0, ann["position"] - 5000)  # 5000 ms = 5 seconds
+        jump_to = max(0, ann["position"] - self.jump_before_ms)  # 5000 ms = 5 seconds
         self.player.setPosition(jump_to)
         self.player.play()
         self.playButton.setText("Pause")
@@ -395,3 +416,19 @@ class DatasetViewer(QMainWindow):
 
         logging.info(f"Annotation updated and resorted to {current_time}ms (index {new_index})")
 
+    def show_config_dialog(self):
+        dialog = ConfigDialog(self, self.jump_before_ms)
+        if dialog.exec():
+            self.jump_before_ms = dialog.get_jump_before()
+            self.save_settings()   # Persist!
+
+
+    def save_settings(self):
+        settings = QSettings("OSLActionSpotting", "DatasetAnnotationTool")
+        settings.setValue("jump_before_ms", self.jump_before_ms)
+
+
+    def load_settings(self):
+        settings = QSettings("OSLActionSpotting", "DatasetAnnotationTool")
+        # get returns QVariant; int(None) raises TypeError, so handle missing gracefully
+        self.jump_before_ms = settings.value("jump_before_ms", 5000)

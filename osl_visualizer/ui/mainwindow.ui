@@ -215,6 +215,7 @@
     </property>
     <addaction name="actionLoad_OSL_Json"/>
     <addaction name="actionSave_OSL_JSON"/>
+    <addaction name="actionOpen_Settings"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -227,6 +228,11 @@
   <action name="actionSave_OSL_JSON">
    <property name="text">
     <string>Save OSL JSON</string>
+   </property>
+  </action>
+  <action name="actionOpen_Settings">
+   <property name="text">
+    <string>Open Settings</string>
    </property>
   </action>
  </widget>
