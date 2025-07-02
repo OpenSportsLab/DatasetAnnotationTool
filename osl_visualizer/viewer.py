@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtCore import Qt, QUrl
+from PyQt6.QtGui import QShortcut, QKeySequence
 
 from utils import ms_to_time
 from utils import ms_to_hms  # at the top if not already imported
@@ -89,6 +90,29 @@ class DatasetViewer(QMainWindow):
         self.addAnnotationButton.clicked.connect(self.add_annotation_at_current_time)
         self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
         self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
+        
+        # self.space_shortcut = 
+        QShortcut(QKeySequence("Space"), self).activated.connect(self.toggle_play_pause)
+
+
+        self.left_shortcut = QShortcut(QKeySequence("Left"), self)
+        self.left_shortcut.activated.connect(lambda: self.step_frame(-1))
+
+        self.right_shortcut = QShortcut(QKeySequence("Right"), self)
+        self.right_shortcut.activated.connect(lambda: self.step_frame(1))
+
+
+        # Ctrl+Arrow for 1 sec
+        self.ctrl_left_shortcut = QShortcut(QKeySequence("Ctrl+Left"), self)
+        self.ctrl_left_shortcut.activated.connect(lambda: self.step_video(-1000))
+        self.ctrl_right_shortcut = QShortcut(QKeySequence("Ctrl+Right"), self)
+        self.ctrl_right_shortcut.activated.connect(lambda: self.step_video(1000))
+
+        # Ctrl+Shift+Arrow for 5 sec
+        self.ctrl_shift_left_shortcut = QShortcut(QKeySequence("Ctrl+Shift+Left"), self)
+        self.ctrl_shift_left_shortcut.activated.connect(lambda: self.step_video(-5000))
+        self.ctrl_shift_right_shortcut = QShortcut(QKeySequence("Ctrl+Shift+Right"), self)
+        self.ctrl_shift_right_shortcut.activated.connect(lambda: self.step_video(5000))
 
 
         self.load_settings()
@@ -432,3 +456,4 @@ class DatasetViewer(QMainWindow):
         settings = QSettings("OSLActionSpotting", "DatasetAnnotationTool")
         # get returns QVariant; int(None) raises TypeError, so handle missing gracefully
         self.jump_before_ms = settings.value("jump_before_ms", 5000)
+
