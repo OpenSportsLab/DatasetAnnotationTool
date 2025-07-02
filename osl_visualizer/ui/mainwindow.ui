@@ -91,15 +91,15 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="videoControlsLayout">
-          <item>
-           <widget class="QPushButton" name="playButton">
-            <property name="text">
-             <string>Play</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
+        <layout class="QHBoxLayout" name="videoControlsLayout">
+        <item><widget class="QPushButton" name="back5sButton"><property name="text"><string>&lt;&lt; 5s</string></property></widget></item>
+        <item><widget class="QPushButton" name="back1sButton"><property name="text"><string>&lt; 1s</string></property></widget></item>
+        <item><widget class="QPushButton" name="backFrameButton"><property name="text"><string>&lt;|</string></property></widget></item>
+        <item><widget class="QPushButton" name="playButton"><property name="text"><string>Play</string></property></widget></item>
+        <item><widget class="QPushButton" name="forwardFrameButton"><property name="text"><string>|&gt;</string></property></widget></item>
+        <item><widget class="QPushButton" name="forward1sButton"><property name="text"><string>1s &gt;</string></property></widget></item>
+        <item><widget class="QPushButton" name="forward5sButton"><property name="text"><string>5s &gt;&gt;</string></property></widget></item>
+        </layout>
         </item>
        </layout>
       </widget>
@@ -134,23 +134,18 @@
           <item row="0" column="1">
            <widget class="QComboBox" name="labelComboBox"/>
           </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="timestampLabel">
-            <property name="text">
-             <string>Timestamp (ms)</string>
-            </property>
-           </widget>
-          </item>
           <item row="1" column="1">
-           <widget class="QSpinBox" name="timeSpinBox">
-            <property name="maximum">
-             <number>10000000</number>
-            </property>
-            <property name="singleStep">
-             <number>1000</number>
-            </property>
-           </widget>
-          </item>
+  <widget class="QLabel" name="annotationTimeLabel"/>
+</item>
+<item row="2" column="1">
+  <widget class="QPushButton" name="setTimeToVideoButton">
+    <property name="text">
+      <string>Set to Current Video Time</string>
+    </property>
+  </widget>
+</item>
+
+
          </layout>
         </item>
         <item>
@@ -185,6 +180,20 @@
           </item>
          </layout>
         </item>
+        <item>
+ <widget class="QPushButton" name="addAnnotationButton">
+  <property name="text">
+   <string>Add Annotation at Current Time</string>
+  </property>
+ </widget>
+</item>
+<item>
+ <widget class="QPushButton" name="removeAnnotationButton">
+  <property name="text">
+   <string>Remove Selected Annotation</string>
+  </property>
+ </widget>
+</item>
        </layout>
       </widget>
      </widget>

@@ -11,6 +11,9 @@ from PyQt6.QtMultimediaWidgets import QVideoWidget
 from PyQt6.QtCore import Qt, QUrl
 
 from utils import ms_to_time
+from utils import ms_to_hms  # at the top if not already imported
+from utils import ms_to_hms_ms
+from utils import hms_ms_to_ms
 
 logging.basicConfig(
     level=logging.INFO,
@@ -45,6 +48,7 @@ class DatasetViewer(QMainWindow):
         self.audio_output = QAudioOutput(self)
         self.player.setAudioOutput(self.audio_output)
         self.player.setVideoOutput(self.videoWidget)
+        
 
         # Connect signals
         self.loadButton.clicked.connect(self.load_osl_json)
@@ -53,12 +57,22 @@ class DatasetViewer(QMainWindow):
         self.annotationListWidget.itemClicked.connect(self.select_annotation)
         self.playButton.clicked.connect(self.toggle_play_pause)
         self.labelComboBox.currentIndexChanged.connect(self.update_annotation)
-        self.timeSpinBox.valueChanged.connect(self.update_annotation)
+        self.setTimeToVideoButton.clicked.connect(self.set_annotation_time_to_video)
         self.prevButton.clicked.connect(self.go_to_previous_annotation)
         self.nextButton.clicked.connect(self.go_to_next_annotation)
         self.slider.sliderMoved.connect(self.seek_slider)
         self.player.positionChanged.connect(self.update_slider)
         self.player.durationChanged.connect(self.update_duration)
+        self.back5sButton.clicked.connect(lambda: self.step_video(-5000))
+        self.back1sButton.clicked.connect(lambda: self.step_video(-1000))
+        self.forward1sButton.clicked.connect(lambda: self.step_video(1000))
+        self.forward5sButton.clicked.connect(lambda: self.step_video(5000))
+        self.backFrameButton.clicked.connect(lambda: self.step_frame(-1))
+        self.forwardFrameButton.clicked.connect(lambda: self.step_frame(1))
+        self.addAnnotationButton.clicked.connect(self.add_annotation_at_current_time)
+        self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
+
+
 
     def load_osl_json(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", "", "JSON Files (*.json)")
@@ -119,13 +133,15 @@ class DatasetViewer(QMainWindow):
         logging.info(f"Selected video: {self.current_video_path}")
 
         self.annotationListWidget.clear()
+
         for idx, ann in enumerate(self.current_annotations):
-            timestamp = ann["position"] / 1000
+            hms = ms_to_hms_ms(ann["position"])
             label = ann["label"]
-            display = f"[{timestamp:.1f}s] {label}"
+            display = f"[{hms}] {label}"
             ann_item = QListWidgetItem(display)
             ann_item.setData(Qt.ItemDataRole.UserRole, idx)
             self.annotationListWidget.addItem(ann_item)
+
 
         if os.path.exists(self.current_video_path):
             self.player.setSource(QUrl.fromLocalFile(self.current_video_path))
@@ -144,9 +160,7 @@ class DatasetViewer(QMainWindow):
         self.labelComboBox.blockSignals(True)
         self.labelComboBox.setCurrentText(ann["label"])
         self.labelComboBox.blockSignals(False)
-        self.timeSpinBox.blockSignals(True)
-        self.timeSpinBox.setValue(ann["position"])
-        self.timeSpinBox.blockSignals(False)
+        self.annotationTimeLabel.setText(ms_to_hms_ms(ann["position"]))
         self._updating_selection = False
 
         if "metadata" in ann:
@@ -155,7 +169,8 @@ class DatasetViewer(QMainWindow):
         else:
             self.metadataTextEdit.setText("")
 
-        self.player.setPosition(ann["position"])
+        jump_to = max(0, ann["position"] - 5000)  # 5000 ms = 5 seconds
+        self.player.setPosition(jump_to)
         self.player.play()
         self.playButton.setText("Pause")
         logging.info(f"Selected annotation at idx={idx}, time={ann['position']}ms, label={ann['label']}")
@@ -164,13 +179,26 @@ class DatasetViewer(QMainWindow):
         if self.current_annotation_index is None or self._updating_selection:
             return
         new_label = self.labelComboBox.currentText()
-        new_time = self.timeSpinBox.value()
+
+        try:
+            new_time = hms_ms_to_ms(self.timeLineEdit.text())
+        except ValueError:
+            QMessageBox.warning(self, "Invalid time format", "Please enter time as HH:MM:SS:ZZZ")
+            return
+
         ann = self.current_annotations[self.current_annotation_index]
         ann["label"] = new_label
         ann["position"] = new_time
 
+
+        # hms = ms_to_hms(ann["position"])
+        # label = ann["label"]
+        display = f"[{ms_to_hms(new_time)}] {new_label}"
+        # ann_item = QListWidgetItem(display)
+
         item = self.annotationListWidget.item(self.current_annotation_index)
-        item.setText(f"[{new_time / 1000:.1f}s] {new_label}")
+        # item.setText(f"[{new_time / 1000:.1f}s] {new_label}")
+        item.setText(display)
 
         logging.info(f"Updated annotation idx={self.current_annotation_index} to time={new_time}ms, label={new_label}")
 
@@ -233,3 +261,137 @@ class DatasetViewer(QMainWindow):
             self.player.setPosition(pos)
             self.timeLabel.setText(f"{ms_to_time(pos)} / {ms_to_time(duration)}")
             logging.info(f"Seeked video to {pos}ms.")
+
+
+    def step_video(self, ms_delta):
+        """Jump forward/backward in the video by ms_delta milliseconds."""
+        pos = self.player.position()
+        duration = self.player.duration()
+        new_pos = min(max(pos + ms_delta, 0), duration)
+        self.player.setPosition(new_pos)
+
+    def step_frame(self, direction):
+        """
+        Step one frame forward (direction=1) or backward (direction=-1).
+        Most videos are ~25-30 FPS, so 1 frame ≈ 33ms or 40ms.
+        Adjust as needed for your typical frame rate.
+        """
+        frame_ms = 40  # ~25 FPS; adjust as needed
+        self.step_video(frame_ms * direction)
+
+    def add_annotation_at_current_time(self):
+        if not self.current_video_info:
+            QMessageBox.warning(self, "No video", "Please select a video first.")
+            return
+        current_time = int(self.player.position())
+        current_label = self.labelComboBox.currentText() or (self.available_labels[0] if self.available_labels else "Event")
+        # Create new annotation
+        new_annotation = {
+            "position": current_time,
+            "label": current_label,
+            "metadata": {}
+        }
+        # Insert in sorted order
+        inserted = False
+        for idx, ann in enumerate(self.current_annotations):
+            if current_time < ann["position"]:
+                self.current_annotations.insert(idx, new_annotation)
+                inserted = True
+                break
+        if not inserted:
+            self.current_annotations.append(new_annotation)
+        self.current_video_info["annotations"] = self.current_annotations
+
+        # Refresh the annotation list widget
+        from utils import ms_to_hms
+        self.annotationListWidget.clear()
+        for idx, ann in enumerate(self.current_annotations):
+            hms = ms_to_hms_ms(ann["position"])
+            label = ann["label"]
+            display = f"[{hms}] {label}"
+            ann_item = QListWidgetItem(display)
+            ann_item.setData(Qt.ItemDataRole.UserRole, idx)
+            self.annotationListWidget.addItem(ann_item)
+
+        # Set selection to the newly added annotation
+        for idx, ann in enumerate(self.current_annotations):
+            if ann is new_annotation:
+                self.annotationListWidget.setCurrentRow(idx)
+                break
+
+        logging.info(f"Added annotation at {current_time}ms, label={current_label}")
+
+    def remove_selected_annotation(self):
+        selected_row = self.annotationListWidget.currentRow()
+        if selected_row < 0 or selected_row >= len(self.current_annotations):
+            QMessageBox.warning(self, "No Selection", "Please select an annotation to remove.")
+            return
+
+        # Confirm deletion (optional, can be removed if not desired)
+        ret = QMessageBox.question(
+            self, "Remove Annotation",
+            "Are you sure you want to remove the selected annotation?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if ret != QMessageBox.StandardButton.Yes:
+            return
+
+        # Remove from list and data
+        removed = self.current_annotations.pop(selected_row)
+        self.current_video_info["annotations"] = self.current_annotations
+
+        # Refresh list widget
+        from utils import ms_to_hms
+        self.annotationListWidget.clear()
+        for idx, ann in enumerate(self.current_annotations):
+            hms = ms_to_hms_ms(ann["position"])
+            label = ann["label"]
+            display = f"[{hms}] {label}"
+            ann_item = QListWidgetItem(display)
+            ann_item.setData(Qt.ItemDataRole.UserRole, idx)
+            self.annotationListWidget.addItem(ann_item)
+
+        # Optionally select the next annotation
+        if self.current_annotations:
+            next_row = min(selected_row, len(self.current_annotations) - 1)
+            self.annotationListWidget.setCurrentRow(next_row)
+        else:
+            self.current_annotation_index = None
+
+        logging.info(f"Removed annotation at {removed['position']}ms, label={removed['label']}")
+
+    def set_annotation_time_to_video(self):
+        if self.current_annotation_index is None:
+            QMessageBox.warning(self, "No annotation selected", "Please select an annotation to update.")
+            return
+
+        current_time = int(self.player.position())
+        ann = self.current_annotations[self.current_annotation_index]
+        ann["position"] = current_time
+
+        # Resort the annotations list by position (time)
+        self.current_annotations.sort(key=lambda a: a["position"])
+        self.current_video_info["annotations"] = self.current_annotations
+
+        # Refresh the annotation list widget
+        from utils import ms_to_hms, ms_to_hms_ms
+        self.annotationListWidget.clear()
+        new_index = 0
+        for idx, a in enumerate(self.current_annotations):
+            hms = ms_to_hms_ms(a["position"])
+            label = a["label"]
+            display = f"[{hms}] {label}"
+            ann_item = QListWidgetItem(display)
+            ann_item.setData(Qt.ItemDataRole.UserRole, idx)
+            self.annotationListWidget.addItem(ann_item)
+            if a is ann:
+                new_index = idx
+
+        # Update the time label
+        self.annotationTimeLabel.setText(ms_to_hms_ms(current_time))
+        # Select the updated annotation in the new position
+        self.annotationListWidget.setCurrentRow(new_index)
+        self.current_annotation_index = new_index
+
+        logging.info(f"Annotation updated and resorted to {current_time}ms (index {new_index})")
+
