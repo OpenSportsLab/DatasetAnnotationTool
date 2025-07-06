@@ -104,6 +104,8 @@ class DatasetViewer(QMainWindow):
         self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
         self.addLabelButton.clicked.connect(self.add_label)
         self.removeLabelButton.clicked.connect(self.remove_label)
+        self.addVideoButton.clicked.connect(self.add_video)
+        self.removeVideoButton.clicked.connect(self.remove_video)
         self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
         
 
@@ -330,6 +332,49 @@ class DatasetViewer(QMainWindow):
         else:
             QMessageBox.warning(self, "Error", f"Label '{label}' not found.")
 
+
+    # ---------- Video Files Management ----------
+
+    def add_video(self):
+        file_path, _ = QFileDialog.getOpenFileName(self, "Select Video File", self.last_osl_dir, "Video Files (*.mp4 *.avi *.mkv);;All Files (*)")
+        if not file_path:
+            return
+        # Relative path for OSL dataset
+        rel_path = os.path.relpath(file_path, self.last_osl_dir) if self.last_osl_dir else file_path
+        # Create video entry
+        new_video = {
+            "path": rel_path,
+            "annotations": []
+        }
+        if "videos" not in self.osl_data:
+            self.osl_data["videos"] = []
+        self.osl_data["videos"].append(new_video)
+        self.osl_data["videos"].sort(key=lambda v: v["path"])
+        self.videoModel.set_videos(self.osl_data["videos"])
+
+        logging.info(f"Added video: {rel_path}")
+
+    def remove_video(self):
+        idx = self.videoListView.currentIndex().row()
+        if idx < 0 or idx >= len(self.videoModel.videos):
+            QMessageBox.warning(self, "No Selection", "Please select a video to remove.")
+            return
+        video = self.videoModel.videos[idx]
+        ret = QMessageBox.question(
+            self, "Remove Video",
+            f"Are you sure you want to remove the video '{video['path']}' and all its annotations?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if ret != QMessageBox.StandardButton.Yes:
+            return
+        # Remove from OSL data
+        del self.osl_data["videos"][idx]
+        self.videoModel.set_videos(self.osl_data["videos"])
+        # Reset annotation panel if you just deleted the current video
+        if self.current_video_info == video:
+            self.current_video_info = None
+            self.annotationModel.set_annotations([])
+        logging.info(f"Removed video: {video['path']}")
 
     # ---------- Video Playback Controls ----------
 

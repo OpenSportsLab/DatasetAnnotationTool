@@ -53,6 +53,20 @@
         <item>
          <widget class="QListView" name="videoListView"/>
         </item>
+        <item>
+         <widget class="QPushButton" name="addVideoButton">
+          <property name="text">
+           <string>Add Video</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="removeVideoButton">
+          <property name="text">
+           <string>Remove Video</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="centerPanel">
