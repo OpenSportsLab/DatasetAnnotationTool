@@ -14,10 +14,12 @@ jobs:
       - uses: actions/checkout@v4
       - id: notes
         run: |
-          echo 'changelog<<EOF' >> $GITHUB_OUTPUT
-          git log -20 --pretty=format:"* %s" > temp_changelog.txt
-          cat temp_changelog.txt >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
+          {
+            echo 'changelog<<EOF'
+            git log -20 --pretty=format:"* %s"
+            echo 'EOF'
+          } >> $GITHUB_OUTPUT
+
 
   build-windows:
     needs: generate-release-notes
