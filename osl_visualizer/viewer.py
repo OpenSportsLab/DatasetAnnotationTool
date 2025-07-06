@@ -22,6 +22,16 @@ logging.basicConfig(
     handlers=[logging.StreamHandler()]
 )
 
+class StatusBarHandler(logging.Handler):
+    def __init__(self, status_bar):
+        super().__init__()
+        self.status_bar = status_bar
+
+    def emit(self, record):
+        msg = self.format(record)
+        # Display message on status bar
+        self.status_bar.showMessage(msg, 5000)  # Display for 5 seconds (5000 ms)
+
 class DatasetViewer(QMainWindow):
     """Main window for the OSL Dataset Visualizer application."""
     def __init__(self):
@@ -36,6 +46,13 @@ class DatasetViewer(QMainWindow):
         placeholder.deleteLater()
         self.videoWidget.setMinimumSize(300, 200)
         self.videoWidget.show()
+
+        # Set Logging Configuration
+        status_bar_handler = StatusBarHandler(self.statusBar)
+        status_bar_handler.setLevel(logging.INFO)
+        formatter = logging.Formatter('%(asctime)s %(levelname)s:%(message)s')
+        status_bar_handler.setFormatter(formatter)
+        logging.getLogger().addHandler(status_bar_handler)
 
         # State variables
         self.osl_data = None
