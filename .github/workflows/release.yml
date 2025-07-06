@@ -60,7 +60,7 @@ jobs:
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/main
+          files: dist/OSL-GUI-mac
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
 
