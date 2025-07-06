@@ -108,19 +108,22 @@ class DatasetViewer(QMainWindow):
         """Sets up keyboard shortcuts for video controls and annotation."""
         QShortcut(QKeySequence("Space"), self).activated.connect(self.toggle_play_pause)
         QShortcut(QKeySequence("A"), self).activated.connect(self.add_annotation_at_current_time)
+        QShortcut(QKeySequence("S"), self).activated.connect(self.set_annotation_time_to_video)
         QShortcut(QKeySequence("Left"), self).activated.connect(lambda: self.step_frame(-1))
         QShortcut(QKeySequence("Right"), self).activated.connect(lambda: self.step_frame(1))
         QShortcut(QKeySequence("Ctrl+Left"), self).activated.connect(lambda: self.step_video(-1000))
         QShortcut(QKeySequence("Ctrl+Right"), self).activated.connect(lambda: self.step_video(1000))
         QShortcut(QKeySequence("Ctrl+Shift+Left"), self).activated.connect(lambda: self.step_video(-5000))
         QShortcut(QKeySequence("Ctrl+Shift+Right"), self).activated.connect(lambda: self.step_video(5000))
+        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_osl_json)
+        QShortcut(QKeySequence("Ctrl+Shift+S"), self).activated.connect(self.save_as_osl_json)
 
     # ---------- File Operations ----------
 
     def load_osl_json(self):
         """Open a file dialog to select and load an OSL JSON file."""
-        self.file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
-        self.load_osl_json_from_file(self.file_path)
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
+        self.load_osl_json_from_file(file_path)
         
     def load_osl_json_from_file(self, file_path):
         """Load OSL JSON data from the specified file path."""
@@ -140,12 +143,21 @@ class DatasetViewer(QMainWindow):
                 if hasattr(self, "player"):
                     self.player.stop()       # Stop playback (if running)
                     self.player.setSource(QUrl.fromLocalFile(""))
-
+                self.file_path = file_path
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to load JSON: {e}")
 
     def save_osl_json(self):
         """Save current OSL JSON data to currentfile."""
+        ret = QMessageBox.question(
+            self,
+            "Save OSL JSON file",
+            f"Are you sure you want to save the OSL JSON file to {self.file_path}?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if ret != QMessageBox.StandardButton.Yes:
+            return  # Cancel saving
+
         if not self.osl_data:
             logging.warning("No data to save.")
             return
