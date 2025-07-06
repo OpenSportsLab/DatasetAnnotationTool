@@ -13,7 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - id: notes
-      - id: notes
         run: |
           echo "changelog=$(git log -20 --pretty=format:'* %s' | sed ':a;N;$!ba;s/\n/%0A/g')" >> $GITHUB_OUTPUT
         
