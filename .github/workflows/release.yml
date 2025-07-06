@@ -54,9 +54,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build app
-        run: pyinstaller --onefile --windowed osl_visualizer/main.py
+        run: cd osl_visualizer; pyinstaller --onefile --windowed main.py --add-data "ui:ui"; cd ..
       - name: Rename binary
-        run: mv dist/main dist/OSL-GUI-mac
+        run: mv osl_visualizer/dist/main dist/OSL-GUI-mac
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
