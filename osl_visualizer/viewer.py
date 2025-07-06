@@ -170,34 +170,39 @@ class DatasetViewer(QMainWindow):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if ret != QMessageBox.StandardButton.Yes:
-            return # Cancel saving
+            return False # Cancel saving
 
         if not self.osl_data:
             logging.warning("No data to save.")
-            return
-        self.save_osl_json_from_file(self.file_path)
+            return False
+        saved = self.save_osl_json_from_file(self.file_path)
+        return saved
 
     def save_as_osl_json(self):
         """Open a file dialog and save current OSL JSON data to file."""
         if not self.osl_data:
             logging.warning("No data to save.")
-            return
+            return False
         file_path, _ = QFileDialog.getSaveFileName(self, "Save OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
-        self.save_osl_json_from_file(file_path)
+        saved = self.save_osl_json_from_file(file_path)
+        return saved
 
     def save_osl_json_from_file(self, file_path):
         """Save current OSL JSON data to file."""
         if not file_path:
             logging.info("Save cancelled.")
-            return
+            return False
         try:
             with open(file_path, 'w') as f:
                 json.dump(self.osl_data, f, indent=2)
             logging.info(f"Annotations saved to {file_path}")
             self.is_modified = False  # Reset modified flag after saving
             QMessageBox.information(self, "Saved", f"Annotations saved to {file_path}")
+            return True
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save JSON: {e}")
+            return False
+        
 
     # ---------- Model/View Selection ----------
 
@@ -506,30 +511,48 @@ class DatasetViewer(QMainWindow):
         self.last_osl_dir = settings.value("last_osl_dir", "")
     # from PyQt6.QtWidgets import QMessageBox, QPushButton
 
-    def closeEvent(self, event):
-        print(self.is_modified, "is modified")
-        if self.is_modified:
-            msg_box = QMessageBox(self)
-            msg_box.setWindowTitle("Save Changes?")
-            msg_box.setText("You have unsaved changes. What do you want to do before quitting?")
-            save_btn = msg_box.addButton("Save", QMessageBox.ButtonRole.AcceptRole)
-            save_as_btn = msg_box.addButton("Save As...", QMessageBox.ButtonRole.ActionRole)
-            dont_save_btn = msg_box.addButton("Don't Save", QMessageBox.ButtonRole.DestructiveRole)
-            cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
-            msg_box.setIcon(QMessageBox.Icon.Question)
-            msg_box.exec()
 
-            clicked = msg_box.clickedButton()
-            if clicked == save_btn:
-                self.save_osl_json()
-                event.accept()
-            elif clicked == save_as_btn:
-                self.save_as_osl_json()
-                event.accept()
-            elif clicked == dont_save_btn:
-                event.accept()
-            else:  # Cancel or close
+    # ---------- Close Event Handling ----------
+
+    def maybe_save_before_exit(self, event):
+        """Prompts the user to save before quitting. Returns True to continue quitting, False to cancel."""
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle("Save Changes?")
+        msg_box.setText("You have unsaved changes. What do you want to do before quitting?")
+        save_btn = msg_box.addButton("Save", QMessageBox.ButtonRole.AcceptRole)
+        save_as_btn = msg_box.addButton("Save As...", QMessageBox.ButtonRole.ActionRole)
+        dont_save_btn = msg_box.addButton("Don't Save", QMessageBox.ButtonRole.DestructiveRole)
+        cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+        msg_box.setIcon(QMessageBox.Icon.Question)
+        msg_box.exec()
+
+        clicked = msg_box.clickedButton()
+        if clicked == save_btn:
+            saved = self.save_osl_json()
+            if saved:
+                return True  # Allow quit
+            else:
                 event.ignore()
+                return False
+        elif clicked == save_as_btn:
+            # Only allow quit if user actually saves
+            saved = self.save_as_osl_json()
+            if saved:    # save_as_osl_json should return True if saved, False if cancelled
+                return True
+            else:
+                event.ignore()
+                return False
+        elif clicked == dont_save_btn:
+            return True  # Allow quit without saving
+        else:  # Cancel
+            event.ignore()
+            return False
+        
+    def closeEvent(self, event):
+        if self.is_modified:
+            if self.maybe_save_before_exit(event):
+                event.accept()
+            # If not, event is already ignored inside maybe_save_before_exit
         else:
             event.accept()
 
