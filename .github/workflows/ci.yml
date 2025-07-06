@@ -19,7 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build exe
-        run: pyinstaller --onefile --windowed osl_visualizer/main.py
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py  --add-data "osl_visualizer/ui;ui"
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -38,7 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build app
-        run: pyinstaller --onefile --windowed main.py --add-data "ui:osl_visualizer/ui"
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py --add-data "osl_visualizer/ui:ui"
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -58,7 +58,7 @@ jobs:
           sudo apt-get install -y libgl1 libglib2.0-0
           pip install pyinstaller pyqt6 opencv-python
       - name: Build binary
-        run: pyinstaller --onefile --windowed osl_visualizer/main.py
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py --add-data "osl_visualizer/ui:ui"
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
