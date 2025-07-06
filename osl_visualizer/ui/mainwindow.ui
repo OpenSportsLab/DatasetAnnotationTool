@@ -44,7 +44,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="videoListWidget"/>
+         <widget class="QListView" name="videoListView"/>
         </item>
        </layout>
       </widget>
@@ -113,7 +113,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QListWidget" name="annotationListWidget"/>
+         <widget class="QListView" name="annotationListView"/>
         </item>
         <item>
          <widget class="QLabel" name="editLabel">
