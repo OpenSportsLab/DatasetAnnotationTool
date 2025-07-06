@@ -5,7 +5,7 @@ import logging
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import (
-    QMainWindow, QFileDialog, QMessageBox
+    QMainWindow, QFileDialog, QMessageBox, QInputDialog
 )
 from PyQt6.QtMultimedia import QMediaPlayer, QAudioOutput
 from PyQt6.QtMultimediaWidgets import QVideoWidget
@@ -102,7 +102,10 @@ class DatasetViewer(QMainWindow):
         self.forwardFrameButton.clicked.connect(lambda: self.step_frame(1))
         self.addAnnotationButton.clicked.connect(self.add_annotation_at_current_time)
         self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
+        self.addLabelButton.clicked.connect(self.add_label)
+        self.removeLabelButton.clicked.connect(self.remove_label)
         self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
+        
 
     def _setup_shortcuts(self):
         """Sets up keyboard shortcuts for video controls and annotation."""
@@ -214,7 +217,7 @@ class DatasetViewer(QMainWindow):
         self.labelComboBox.blockSignals(True)
         self.labelComboBox.setCurrentText(ann["label"])
         self.labelComboBox.blockSignals(False)
-        self.annotationTimeLabel.setText(ms_to_hms_ms(ann["position"]))
+        # self.annotationTimeLabel.setText(ms_to_hms_ms(ann["position"]))
         if "metadata" in ann:
             pretty = json.dumps(ann["metadata"], indent=2, ensure_ascii=False)
             self.metadataTextEdit.setText(pretty)
@@ -257,7 +260,7 @@ class DatasetViewer(QMainWindow):
         for new_idx, a in enumerate(anns):
             if a is ann:
                 self.annotationListView.setCurrentIndex(self.annotationModel.index(new_idx))
-                self.annotationTimeLabel.setText(ms_to_hms_ms(current_time))
+                # self.annotationTimeLabel.setText(ms_to_hms_ms(current_time))
                 break
 
     def add_annotation_at_current_time(self):
@@ -266,7 +269,7 @@ class DatasetViewer(QMainWindow):
             QMessageBox.warning(self, "No video", "Please select a video first.")
             return
         current_time = int(self.player.position())
-        current_label = self.labelComboBox.currentText() or (self.osl_data["labels"][0] if self.osl_data and "labels" in self.osl_data and self.osl_data["labels"] else "Event")
+        current_label = self.labelComboBox.currentText() # or (self.osl_data["labels"][0] if self.osl_data and "labels" in self.osl_data and self.osl_data["labels"] else "Event")
         new_annotation = {
             "position": current_time,
             "label": current_label,
@@ -293,6 +296,40 @@ class DatasetViewer(QMainWindow):
         self.annotationModel.remove_annotation(idx)
         self.current_video_info["annotations"] = self.annotationModel.annotations
         logging.info(f"Removed annotation at idx={idx}")
+    
+    # ---------- Label Management ----------
+
+    def add_label(self):
+        text, ok = QInputDialog.getText(self, "Add Label", "Enter new label:")
+        if ok and text.strip():
+            if "labels" not in self.osl_data:
+                self.osl_data["labels"] = []
+            if text not in self.osl_data["labels"]:
+                self.osl_data["labels"].append(text)
+                self.labelComboBox.addItem(text)
+                logging.info(f"Added label: {text}")
+            else:
+                QMessageBox.information(self, "Duplicate", f"Label '{text}' already exists.")
+
+    def remove_label(self):
+        label = self.labelComboBox.currentText()
+        if not label:
+            QMessageBox.warning(self, "No Selection", "No label selected.")
+            return
+        ret = QMessageBox.question(
+            self, "Remove Label",
+            f"Are you sure you want to remove the label '{label}'?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        if ret != QMessageBox.StandardButton.Yes:
+            return
+        if "labels" in self.osl_data and label in self.osl_data["labels"]:
+            self.osl_data["labels"].remove(label)
+            self.labelComboBox.removeItem(self.labelComboBox.currentIndex())
+            logging.info(f"Removed label: {label}")
+        else:
+            QMessageBox.warning(self, "Error", f"Label '{label}' not found.")
+
 
     # ---------- Video Playback Controls ----------
 
