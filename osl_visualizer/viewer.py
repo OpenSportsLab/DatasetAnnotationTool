@@ -66,6 +66,7 @@ class DatasetViewer(QMainWindow):
         """Connects all UI widgets to their respective slots."""
         self.loadButton.clicked.connect(self.load_osl_json)
         self.saveButton.clicked.connect(self.save_osl_json)
+        self.saveAsButton.clicked.connect(self.save_as_osl_json)
         self.videoListView.clicked.connect(self.on_video_selected)
         self.annotationListView.clicked.connect(self.on_annotation_selected)
         self.playButton.clicked.connect(self.toggle_play_pause)
@@ -101,7 +102,11 @@ class DatasetViewer(QMainWindow):
 
     def load_osl_json(self):
         """Open a file dialog to select and load an OSL JSON file."""
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
+        self.file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
+        self.load_osl_json_from_file(self.file_path)
+        
+    def load_osl_json_from_file(self, file_path):
+        """Load OSL JSON data from the specified file path."""
         if file_path:
             logging.info(f"Loading OSL JSON file: {file_path}")
             self.last_osl_dir = os.path.dirname(file_path)
@@ -115,15 +120,30 @@ class DatasetViewer(QMainWindow):
                 self.labelComboBox.clear()
                 self.labelComboBox.addItems(self.osl_data.get("labels", []))
                 self.save_settings()
+                if hasattr(self, "player"):
+                    self.player.stop()       # Stop playback (if running)
+                    self.player.setSource(QUrl.fromLocalFile(""))
+
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to load JSON: {e}")
 
     def save_osl_json(self):
+        """Save current OSL JSON data to currentfile."""
+        if not self.osl_data:
+            logging.warning("No data to save.")
+            return
+        self.save_osl_json_from_file(self.file_path)
+
+    def save_as_osl_json(self):
         """Open a file dialog and save current OSL JSON data to file."""
         if not self.osl_data:
             logging.warning("No data to save.")
             return
         file_path, _ = QFileDialog.getSaveFileName(self, "Save OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
+        self.save_osl_json_from_file(file_path)
+
+    def save_osl_json_from_file(self, file_path):
+        """Save current OSL JSON data to file."""
         if not file_path:
             logging.info("Save cancelled.")
             return
@@ -153,9 +173,9 @@ class DatasetViewer(QMainWindow):
 
         if os.path.exists(current_video_path):
             self.player.setSource(QUrl.fromLocalFile(current_video_path))
-            self.player.play()
-            self.playButton.setText("Pause")
-            logging.info("Started video playback.")
+            # self.player.play()
+            # self.playButton.setText("Pause")
+            # logging.info("Started video playback.")
         else:
             QMessageBox.warning(self, "File not found", f"Video file not found:\n{current_video_path}")
 
@@ -173,8 +193,8 @@ class DatasetViewer(QMainWindow):
             self.metadataTextEdit.setText("")
         jump_to = max(0, ann["position"] - self.jump_before_ms)
         self.player.setPosition(jump_to)
-        self.player.play()
-        self.playButton.setText("Pause")
+        # self.player.play()
+        # self.playButton.setText("Pause")
         logging.info(f"Selected annotation at time={ann['position']}ms, label={ann['label']}")
 
     # ---------- Annotation Editing ----------
@@ -288,15 +308,15 @@ class DatasetViewer(QMainWindow):
             slider_value = int((position / duration) * 1000)
             self.slider.setValue(slider_value)
         self.timeLabel.setText(f"{ms_to_time(position)} / {ms_to_time(duration)}")
-        self.highlight_current_annotation(position)
+        # self.highlight_current_annotation(position)
         self.slider.blockSignals(False)
 
-    def highlight_current_annotation(self, position):
-        """Highlight the annotation closest to the current playback position."""
-        for i, ann in enumerate(self.annotationModel.annotations):
-            if abs(ann["position"] - position) < 500:
-                self.annotationListView.setCurrentIndex(self.annotationModel.index(i))
-                break
+    # def highlight_current_annotation(self, position):
+    #     """Highlight the annotation closest to the current playback position."""
+    #     for i, ann in enumerate(self.annotationModel.annotations):
+    #         if abs(ann["position"] - position) < 500:
+    #             self.annotationListView.setCurrentIndex(self.annotationModel.index(i))
+    #             break
 
     def update_duration(self, duration):
         """Reset the slider when video duration changes (e.g., new video loaded)."""
