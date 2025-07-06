@@ -88,3 +88,7 @@ jobs:
           files: dist/OSL-GUI-linux
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
+
+
+permissions:
+  contents: write
