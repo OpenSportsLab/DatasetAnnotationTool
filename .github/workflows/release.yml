@@ -31,7 +31,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build exe
-        run: pyinstaller --onefile --windowed osl_visualizer/main.py
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py --add-data "osl_visualizer/ui;ui"
       - name: Rename binary
         run: move dist\\main.exe dist\\OSL-GUI-win.exe
       - name: Upload Release Asset
@@ -54,13 +54,13 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build app
-        run: pyinstaller --onefile --windowed main.py --add-data "ui:osl_visualizer/ui"
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py --add-data "osl_visualizer/ui:ui"
       - name: Rename binary
         run: mv dist/main dist/OSL-GUI-mac
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/OSL-GUI-mac
+          files: dist/main
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
 
@@ -79,7 +79,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install pyinstaller pyqt6 opencv-python
       - name: Build binary
-        run: pyinstaller --onefile --windowed osl_visualizer/main.py
+        run: pyinstaller --onefile --windowed osl_visualizer/main.py --add-data "osl_visualizer/ui:ui"
       - name: Rename binary
         run: mv dist/main dist/OSL-GUI-linux
       - name: Upload Release Asset
