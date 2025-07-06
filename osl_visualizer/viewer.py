@@ -193,6 +193,9 @@ class DatasetViewer(QMainWindow):
             logging.info("Save cancelled.")
             return False
         try:
+            from datetime import datetime
+
+            self.osl_data["date"] = datetime.now().strftime("%Y-%m-%d %H:%M")
             with open(file_path, 'w') as f:
                 json.dump(self.osl_data, f, indent=2)
             logging.info(f"Annotations saved to {file_path}")
