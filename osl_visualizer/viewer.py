@@ -100,6 +100,13 @@ class DatasetViewer(QMainWindow):
         self.forward5sButton.clicked.connect(lambda: self.step_video(5000))
         self.backFrameButton.clicked.connect(lambda: self.step_frame(-1))
         self.forwardFrameButton.clicked.connect(lambda: self.step_frame(1))
+        self.speedSlow8Button.clicked.connect(lambda: self.speed_video(0.125))  # 8x slower
+        self.speedSlow4Button.clicked.connect(lambda: self.speed_video(0.250))  # 4x slower
+        self.speedSlow2Button.clicked.connect(lambda: self.speed_video(0.500))  # 2x slower
+        self.speedFast8Button.clicked.connect(lambda: self.speed_video(8))  # 8x faster
+        self.speedFast4Button.clicked.connect(lambda: self.speed_video(4))  # 4x faster
+        self.speedFast2Button.clicked.connect(lambda: self.speed_video(2))  # 2x faster
+        self.speedNormalButton.clicked.connect(lambda: self.speed_video(1))   # Default speed is normal
         self.addAnnotationButton.clicked.connect(self.add_annotation_at_current_time)
         self.removeAnnotationButton.clicked.connect(self.remove_selected_annotation)
         self.addLabelButton.clicked.connect(self.add_label)
@@ -455,6 +462,14 @@ class DatasetViewer(QMainWindow):
         """Jump forward/backward by one frame (approx 40 ms at 25 FPS)."""
         frame_ms = 40  # Adjust for your FPS if needed
         self.step_video(frame_ms * direction)
+
+    def speed_video(self, factor):
+        """Set the playback speed of the video."""
+        if factor <= 0:
+            QMessageBox.warning(self, "Invalid Speed", "Playback speed must be greater than 0.")
+            return
+        self.player.setPlaybackRate(factor)
+        logging.info(f"Set video playback speed to {factor}x")
 
     # ---------- Settings Persistence ----------
 

@@ -112,53 +112,102 @@
          </layout>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="videoControlsLayout">
-          <item>
-           <widget class="QPushButton" name="back5sButton">
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="0" column="6">
+           <widget class="QPushButton" name="forward5sButton">
             <property name="text">
-             <string>&lt;&lt; 5s</string>
+             <string>5s &gt;&gt;</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="back1sButton">
-            <property name="text">
-             <string>&lt; 1s</string>
-            </property>
-           </widget>
-          </item>
-          <item>
+          <item row="0" column="2">
            <widget class="QPushButton" name="backFrameButton">
             <property name="text">
              <string>&lt;|</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="3">
            <widget class="QPushButton" name="playButton">
             <property name="text">
              <string>Play</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="forwardFrameButton">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="back5sButton">
             <property name="text">
-             <string>|&gt;</string>
+             <string>&lt;&lt; 5s</string>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="back1sButton">
+            <property name="text">
+             <string>&lt; 1s</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="5">
            <widget class="QPushButton" name="forward1sButton">
             <property name="text">
              <string>1s &gt;</string>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QPushButton" name="forward5sButton">
+          <item row="0" column="4">
+           <widget class="QPushButton" name="forwardFrameButton">
             <property name="text">
-             <string>5s &gt;&gt;</string>
+             <string>|&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="speedSlow8Button">
+            <property name="text">
+             <string>1/8x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="speedSlow4Button">
+            <property name="text">
+             <string>1/4x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="speedSlow2Button">
+            <property name="text">
+             <string>1/2x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="3">
+           <widget class="QPushButton" name="speedNormalButton">
+            <property name="text">
+             <string>1x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="4">
+           <widget class="QPushButton" name="speedFast2Button">
+            <property name="text">
+             <string>2x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="5">
+           <widget class="QPushButton" name="speedFast4Button">
+            <property name="text">
+             <string>4x</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="6">
+           <widget class="QPushButton" name="speedFast8Button">
+            <property name="text">
+             <string>8x</string>
             </property>
            </widget>
           </item>
