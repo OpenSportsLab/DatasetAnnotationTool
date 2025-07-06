@@ -59,6 +59,7 @@ class DatasetViewer(QMainWindow):
         self.current_video_info = None
         self.jump_before_ms = 5000
         self.last_osl_dir = ""
+        self.is_modified = False # Track if the dataset has been modified
 
         # Multimedia
         self.player = QMediaPlayer(self)
@@ -156,6 +157,7 @@ class DatasetViewer(QMainWindow):
                     self.player.stop()       # Stop playback (if running)
                     self.player.setSource(QUrl.fromLocalFile(""))
                 self.file_path = file_path
+                self.is_modified = False  # Reset modified flag after saving
             except Exception as e:
                 QMessageBox.critical(self, "Error", f"Failed to load JSON: {e}")
 
@@ -168,7 +170,7 @@ class DatasetViewer(QMainWindow):
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
         )
         if ret != QMessageBox.StandardButton.Yes:
-            return  # Cancel saving
+            return # Cancel saving
 
         if not self.osl_data:
             logging.warning("No data to save.")
@@ -192,6 +194,7 @@ class DatasetViewer(QMainWindow):
             with open(file_path, 'w') as f:
                 json.dump(self.osl_data, f, indent=2)
             logging.info(f"Annotations saved to {file_path}")
+            self.is_modified = False  # Reset modified flag after saving
             QMessageBox.information(self, "Saved", f"Annotations saved to {file_path}")
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save JSON: {e}")
@@ -251,6 +254,7 @@ class DatasetViewer(QMainWindow):
             self.annotationModel.index(idx),
             self.annotationModel.index(idx)
         )
+        self.is_modified = True
 
     def set_annotation_time_to_video(self):
         """Set the time of the current annotation to the current video position, resort and refresh."""
@@ -265,6 +269,7 @@ class DatasetViewer(QMainWindow):
         anns = self.annotationModel.annotations
         anns.sort(key=lambda a: a["position"])
         self.annotationModel.set_annotations(anns)
+        self.is_modified = True
         # Find new index
         for new_idx, a in enumerate(anns):
             if a is ann:
@@ -287,6 +292,7 @@ class DatasetViewer(QMainWindow):
         idx = self.annotationModel.add_annotation(new_annotation)
         self.current_video_info["annotations"] = self.annotationModel.annotations
         self.annotationListView.setCurrentIndex(self.annotationModel.index(idx))
+        self.is_modified = True
         logging.info(f"Added annotation at {current_time}ms, label={current_label}")
 
     def remove_selected_annotation(self):
@@ -304,6 +310,7 @@ class DatasetViewer(QMainWindow):
             return
         self.annotationModel.remove_annotation(idx)
         self.current_video_info["annotations"] = self.annotationModel.annotations
+        self.is_modified = True
         logging.info(f"Removed annotation at idx={idx}")
     
     # ---------- Label Management ----------
@@ -319,6 +326,7 @@ class DatasetViewer(QMainWindow):
                 logging.info(f"Added label: {text}")
             else:
                 QMessageBox.information(self, "Duplicate", f"Label '{text}' already exists.")
+            self.is_modified = True
 
     def remove_label(self):
         label = self.labelComboBox.currentText()
@@ -338,6 +346,7 @@ class DatasetViewer(QMainWindow):
             logging.info(f"Removed label: {label}")
         else:
             QMessageBox.warning(self, "Error", f"Label '{label}' not found.")
+        self.is_modified = True
 
 
     # ---------- Video Files Management ----------
@@ -358,7 +367,7 @@ class DatasetViewer(QMainWindow):
         self.osl_data["videos"].append(new_video)
         self.osl_data["videos"].sort(key=lambda v: v["path"])
         self.videoModel.set_videos(self.osl_data["videos"])
-
+        self.is_modified = True
         logging.info(f"Added video: {rel_path}")
 
     def remove_video(self):
@@ -381,6 +390,7 @@ class DatasetViewer(QMainWindow):
         if self.current_video_info == video:
             self.current_video_info = None
             self.annotationModel.set_annotations([])
+        self.is_modified = True
         logging.info(f"Removed video: {video['path']}")
 
     # ---------- Video Playback Controls ----------
@@ -494,3 +504,32 @@ class DatasetViewer(QMainWindow):
         except (TypeError, ValueError):
             self.jump_before_ms = 5000
         self.last_osl_dir = settings.value("last_osl_dir", "")
+    # from PyQt6.QtWidgets import QMessageBox, QPushButton
+
+    def closeEvent(self, event):
+        print(self.is_modified, "is modified")
+        if self.is_modified:
+            msg_box = QMessageBox(self)
+            msg_box.setWindowTitle("Save Changes?")
+            msg_box.setText("You have unsaved changes. What do you want to do before quitting?")
+            save_btn = msg_box.addButton("Save", QMessageBox.ButtonRole.AcceptRole)
+            save_as_btn = msg_box.addButton("Save As...", QMessageBox.ButtonRole.ActionRole)
+            dont_save_btn = msg_box.addButton("Don't Save", QMessageBox.ButtonRole.DestructiveRole)
+            cancel_btn = msg_box.addButton("Cancel", QMessageBox.ButtonRole.RejectRole)
+            msg_box.setIcon(QMessageBox.Icon.Question)
+            msg_box.exec()
+
+            clicked = msg_box.clickedButton()
+            if clicked == save_btn:
+                self.save_osl_json()
+                event.accept()
+            elif clicked == save_as_btn:
+                self.save_as_osl_json()
+                event.accept()
+            elif clicked == dont_save_btn:
+                event.accept()
+            else:  # Cancel or close
+                event.ignore()
+        else:
+            event.accept()
+
