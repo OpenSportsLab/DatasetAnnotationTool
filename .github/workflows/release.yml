@@ -39,10 +39,12 @@ jobs:
         with:
           name: OSL-GUI-Windows
           path: dist/OSL-GUI-win.exe
+      - name: Zip Windows binary
+        run: powershell Compress-Archive -Path dist\OSL-GUI-win.exe -DestinationPath dist\OSL-GUI-win.zip
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/OSL-GUI-win.exe
+          files: dist/OSL-GUI-win.zip
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
 
@@ -67,10 +69,12 @@ jobs:
         with:
           name: OSL-GUI-macOS
           path: dist/OSL-GUI-mac
+      - name: Zip binary
+        run: cd dist && zip OSL-GUI-mac.zip OSL-GUI-mac && cd ..
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/OSL-GUI-mac
+          files: dist/OSL-GUI-mac.zip
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
 
@@ -97,10 +101,12 @@ jobs:
         with:
           name: OSL-GUI-Linux
           path: dist/OSL-GUI-linux
+      - name: Zip Linux binary
+        run: cd dist && zip OSL-GUI-linux.zip OSL-GUI-linux && cd ..
       - name: Upload Release Asset
         uses: softprops/action-gh-release@v2
         with:
-          files: dist/OSL-GUI-linux
+          files: dist/OSL-GUI-linux.zip
           tag_name: ${{ github.ref_name }}
           body: ${{ needs.generate-release-notes.outputs.changelog }}
 
