@@ -2,8 +2,6 @@ name: Build Standalone GUI
 
 on:
   push:
-    tags:
-      - 'v*'
     branches:
       - main
   workflow_dispatch:
