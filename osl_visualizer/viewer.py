@@ -15,6 +15,7 @@ from PyQt6.QtGui import QShortcut, QKeySequence
 from models import VideoListModel, AnnotationListModel
 from dialogs import ConfigDialog
 from utils import ms_to_time, ms_to_hms_ms
+from datetime import datetime
 
 logging.basicConfig(
     level=logging.INFO,
@@ -80,6 +81,9 @@ class DatasetViewer(QMainWindow):
         self._setup_shortcuts()
         self.load_settings()
 
+        # Create a new project on startup
+        self.new_project()
+
     def _connect_signals(self):
         """Connects all UI widgets to their respective slots."""
         self.loadButton.clicked.connect(self.load_osl_json)
@@ -131,6 +135,29 @@ class DatasetViewer(QMainWindow):
         QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_osl_json)
         QShortcut(QKeySequence("Ctrl+Shift+S"), self).activated.connect(self.save_as_osl_json)
 
+    def new_project(self):
+        now = datetime.now()
+        self.osl_data = {
+            "videos": [],
+            "labels": [],
+            "date": now.strftime("%Y-%m-%d %H:%M")
+        }
+        self.current_video_info = None
+        self.jump_before_ms = 5000
+        # self.last_osl_dir = ""
+        self.is_modified = False # Track if the dataset has been modified
+        from pathlib import Path
+        # Set default file path to 'untitled.json' in the Documents folder
+        unique_filename = f"untitled-{now.strftime('%Y%m%d-%H%M%S')}.json"
+        self.last_osl_dir = str(Path.home() / "Documents")
+        self.file_path = os.path.join(self.last_osl_dir, unique_filename)
+
+        self.videoModel.set_videos([])
+        self.annotationModel.set_annotations([])
+        self.labelComboBox.clear()
+        self.current_video_info = None
+        self.is_modified = False
+        logging.info("Started a new OSL project.")
     # ---------- File Operations ----------
 
     def load_osl_json(self):
@@ -193,8 +220,6 @@ class DatasetViewer(QMainWindow):
             logging.info("Save cancelled.")
             return False
         try:
-            from datetime import datetime
-
             self.osl_data["date"] = datetime.now().strftime("%Y-%m-%d %H:%M")
             with open(file_path, 'w') as f:
                 json.dump(self.osl_data, f, indent=2)
@@ -405,6 +430,9 @@ class DatasetViewer(QMainWindow):
 
     def toggle_play_pause(self):
         """Toggle play/pause state of the video."""
+        if self.player.source().isEmpty():
+            QMessageBox.information(self, "No Video", "No video is loaded.")
+            return
         if self.player.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             self.player.pause()
             self.playButton.setText("Play")
