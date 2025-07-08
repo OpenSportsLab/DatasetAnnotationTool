@@ -118,10 +118,18 @@ class DatasetViewer(QMainWindow):
         self.removeLabelButton.clicked.connect(self.remove_label)
         self.addVideoButton.clicked.connect(self.add_video)
         self.removeVideoButton.clicked.connect(self.remove_video)
+        self.actionLoad_OSL_Json.triggered.connect(self.load_osl_json)
+        self.actionSave_OSL_JSON.triggered.connect(self.save_osl_json)
+        self.actionSave_As_OSL_JSON.triggered.connect(self.save_as_osl_json)
         self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
         self.actionDataset_Downloader.triggered.connect(self.open_downloader_dialog)
 
-        
+        # Set keyboard shortcuts directly on the actions
+        self.actionLoad_OSL_Json.setShortcut(QKeySequence("Ctrl+O"))
+        self.actionSave_OSL_JSON.setShortcut(QKeySequence("Ctrl+S"))
+        self.actionSave_As_OSL_JSON.setShortcut(QKeySequence("Ctrl+Shift+S"))
+        self.actionOpen_Settings.setShortcut(QKeySequence("Ctrl+E"))
+        self.actionDataset_Downloader.setShortcut(QKeySequence("Ctrl+D"))
 
     def _setup_shortcuts(self):
         """Sets up keyboard shortcuts for video controls and annotation."""
@@ -134,9 +142,6 @@ class DatasetViewer(QMainWindow):
         QShortcut(QKeySequence("Ctrl+Right"), self).activated.connect(lambda: self.step_video(1000))
         QShortcut(QKeySequence("Ctrl+Shift+Left"), self).activated.connect(lambda: self.step_video(-5000))
         QShortcut(QKeySequence("Ctrl+Shift+Right"), self).activated.connect(lambda: self.step_video(5000))
-        QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_osl_json)
-        QShortcut(QKeySequence("Ctrl+Shift+S"), self).activated.connect(self.save_as_osl_json)
-        QShortcut(QKeySequence("Ctrl+D"), self).activated.connect(self.open_downloader_dialog)
 
     def new_project(self):
         now = datetime.now()
