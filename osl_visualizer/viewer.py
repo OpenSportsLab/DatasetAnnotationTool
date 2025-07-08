@@ -13,7 +13,7 @@ from PyQt6.QtCore import Qt, QUrl, QSettings
 from PyQt6.QtGui import QShortcut, QKeySequence
 
 from models import VideoListModel, AnnotationListModel
-from dialogs import ConfigDialog
+from dialogs import ConfigDialog, DownloaderDialog
 from utils import ms_to_time, ms_to_hms_ms
 from datetime import datetime
 
@@ -119,6 +119,8 @@ class DatasetViewer(QMainWindow):
         self.addVideoButton.clicked.connect(self.add_video)
         self.removeVideoButton.clicked.connect(self.remove_video)
         self.actionOpen_Settings.triggered.connect(self.show_config_dialog)
+        self.actionDataset_Downloader.triggered.connect(self.open_downloader_dialog)
+
         
 
     def _setup_shortcuts(self):
@@ -134,6 +136,7 @@ class DatasetViewer(QMainWindow):
         QShortcut(QKeySequence("Ctrl+Shift+Right"), self).activated.connect(lambda: self.step_video(5000))
         QShortcut(QKeySequence("Ctrl+S"), self).activated.connect(self.save_osl_json)
         QShortcut(QKeySequence("Ctrl+Shift+S"), self).activated.connect(self.save_as_osl_json)
+        QShortcut(QKeySequence("Ctrl+D"), self).activated.connect(self.open_downloader_dialog)
 
     def new_project(self):
         now = datetime.now()
@@ -143,7 +146,7 @@ class DatasetViewer(QMainWindow):
             "date": now.strftime("%Y-%m-%d %H:%M")
         }
         self.current_video_info = None
-        self.jump_before_ms = 5000
+        # self.jump_before_ms = 5000
         # self.last_osl_dir = ""
         self.is_modified = False # Track if the dataset has been modified
         from pathlib import Path
@@ -517,6 +520,12 @@ class DatasetViewer(QMainWindow):
         self.player.setPlaybackRate(factor)
         logging.info(f"Set video playback speed to {factor}x")
 
+    # ---------- Dataset Downloader Dialog ----------
+
+    def open_downloader_dialog(self):
+        dialog = DownloaderDialog(self)
+        dialog.exec()        
+
     # ---------- Settings Persistence ----------
 
     def show_config_dialog(self):
@@ -540,7 +549,6 @@ class DatasetViewer(QMainWindow):
         except (TypeError, ValueError):
             self.jump_before_ms = 5000
         self.last_osl_dir = settings.value("last_osl_dir", "")
-    # from PyQt6.QtWidgets import QMessageBox, QPushButton
 
 
     # ---------- Close Event Handling ----------

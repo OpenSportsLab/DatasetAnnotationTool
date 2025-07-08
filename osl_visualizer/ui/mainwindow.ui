@@ -338,6 +338,7 @@
     <addaction name="actionSave_OSL_JSON"/>
     <addaction name="actionSave_As_OSL_JSON"/>
     <addaction name="actionOpen_Settings"/>
+    <addaction name="actionDataset_Downloader"/>
    </widget>
    <addaction name="menuFile"/>
   </widget>
@@ -360,6 +361,11 @@
   <action name="actionOpen_Settings">
    <property name="text">
     <string>Open Settings</string>
+   </property>
+  </action>
+  <action name="actionDataset_Downloader">
+   <property name="text">
+    <string>Dataset Downloader</string>
    </property>
   </action>
  </widget>
