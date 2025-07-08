@@ -1,5 +1,8 @@
 # OSL Dataset Visualizer
 
+[![Documentation Status](https://img.shields.io/badge/docs-online-brightgreen)](https://opensportslab.github.io/DatasetAnnotationTool/)
+
+
 This is a simple PyQt5-based visualizer for datasets in the OSL (Open Sports Lab) JSON format.
 
 ## Features
