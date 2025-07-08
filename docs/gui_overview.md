@@ -1,5 +1,13 @@
 # GUI Overview
 
+This page provides an overview of the main interface elements:
+- Video player
+- Annotation list
+- Label management
+- Navigation controls
+
+Refer to the screenshots below for a visual guide.
+
 The OSL Annotation Tool is organized in three main panels:
 
 ![GUI Layout](assets/screenshot_layout.png)

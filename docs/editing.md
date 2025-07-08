@@ -1,14 +1,7 @@
 # Editing Annotations
 
-You can edit any annotation by:
+How to modify, move, or delete existing annotations.
 
-- Clicking its timestamp to adjust the start/end time
-- Editing the action label (e.g., "header", "goal", etc.)
-- Deleting annotations you no longer need
-
-Edits are immediately reflected in the annotation list.  
-Remember to **save** your changes!
-
----
-
-**Tip:** Use [Keyboard Shortcuts](shortcuts.md) for quick editing.
+- Select an annotation from the list.
+- Change its label or time.
+- Use the remove button to delete.

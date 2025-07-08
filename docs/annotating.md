@@ -1,13 +1,12 @@
 # Annotating Actions
 
-1. **Play or scrub through the video** to find the action of interest.
-2. **Click "Add Annotation"** (or use the shortcut key) when the action starts or ends.
-3. **Edit the timestamp or label** directly in the annotation list (right panel).
-4. **Repeat** for each action you want to annotate.
+Learn how to add, edit, and manage action annotations in your videos.
 
-- To change an annotation, select it in the list and edit the timestamp or label.
-- To remove an annotation, select and click "Delete".
+## Adding Annotations
+- Select a video.
+- Use the "Add Annotation" button or shortcut.
 
-All changes can be saved to an OSL JSON file.
+## Editing Annotations
+- Select an annotation to edit its label or time.
 
-See [Editing Annotations](editing.md) for advanced editing tips.
+See also: [Editing Annotations](editing.md)

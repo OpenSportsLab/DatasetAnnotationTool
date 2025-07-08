@@ -3,11 +3,10 @@
 ## Requirements
 
 - Python 3.8 or later
-- [PyQt5](https://pypi.org/project/PyQt5/)
-- [OpenCV](https://pypi.org/project/opencv-python/)
-- Other requirements listed in `requirements.txt` (if present)
+- PyQt6
+- Other dependencies (see `requirements.txt`)
 
-## Setup Steps
+## Steps
 
 1. **Clone the repository:**
     ```bash
@@ -26,9 +25,9 @@
     pip install -r requirements.txt
     ```
 
-4. **Run the application:**
+4. **Run the tool:**
     ```bash
-    python osl_visualizer/main.py
+    python -m osl_visualizer.main
     ```
 
 ## Troubleshooting

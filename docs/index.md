@@ -1,6 +1,8 @@
 # OSL Action Spotting Annotation Tool
 
-Welcome to the documentation for the **OSL Action Spotting Annotation Tool** — an open-source graphical tool for annotating sports video datasets, built by [OpenSportsLab](https://github.com/OpenSportsLab).
+Welcome to the OSL Action Spotting Annotation Tool documentation!
+
+This tool helps you annotate action spotting datasets in sports video. Use the navigation to find installation instructions, user guides, and more.
 
 ![Main GUI Screenshot](assets/screenshot_main.png)
 

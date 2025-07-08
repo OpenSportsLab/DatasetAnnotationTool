@@ -3,6 +3,7 @@ site_description: A GUI tool for annotating action spotting datasets in sports v
 site_author: OpenSportsLab
 repo_url: https://github.com/OpenSportsLab/DatasetAnnotationTool
 repo_name: OpenSportsLab/DatasetAnnotationTool
+
 theme:
   name: material
   features:
@@ -24,15 +25,18 @@ nav:
   - Installation: installation.md
   - Getting Started: getting_started.md
   - User Guide:
-      - GUI Overview: gui_overview.md
-      - Annotating Actions: annotating.md
-      - Editing Annotations: editing.md
-      - Saving & Loading: saving_loading.md
-      - Keyboard Shortcuts: shortcuts.md
-  - Batch Tools: batch_tools.md
+      - Overview: gui_overview.md
+      - Annotating:
+          - Annotating Actions: annotating.md
+          - Editing Annotations: editing.md
+          - Saving & Loading: saving_loading.md
+          - Keyboard Shortcuts: shortcuts.md
+      - Batch Tools: batch_tools.md
   - Troubleshooting: troubleshooting.md
   - FAQ: faq.md
   - About: about.md
+  - Contributing: contributing.md  # (add this file if you want contributions)
+  - Changelog: changelog.md        # (add this file if you want to track changes)
 
 # Optional: Add Markdown extensions
 markdown_extensions:

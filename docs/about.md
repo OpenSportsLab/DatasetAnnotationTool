@@ -1,6 +1,6 @@
 # About
 
-The OSL Action Spotting Annotation Tool is developed by [OpenSportsLab](https://github.com/OpenSportsLab), aiming to accelerate research in sports video understanding.
+The OSL Action Spotting Annotation Tool is developed by OpenSportsLab to help researchers and practitioners annotate sports video datasets efficiently.
 
 - **Project Lead:** Silvio Giancola
 - **GitHub:** [OpenSportsLab/DatasetAnnotationTool](https://github.com/OpenSportsLab/DatasetAnnotationTool)

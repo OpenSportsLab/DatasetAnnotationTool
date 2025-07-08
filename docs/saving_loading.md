@@ -1,10 +1,11 @@
-# Saving & Loading Annotations
+# Saving & Loading
 
-- **Save:**  
-  Use **File → Save Annotations** to write your annotations to an OSL JSON file.
+## Saving
+- Use the Save or Save As options in the menu or toolbar.
+- The tool saves your annotations in JSON format.
 
-- **Load:**  
-  Use **File → Load Annotations** to resume work on an existing project.
+## Loading
+- Use the Load option to open an existing annotation file.
 
 The tool uses the [OSL JSON format](https://github.com/OpenSportsLab/OSL-ActionSpotting#osl-json-format) for compatibility.
 
