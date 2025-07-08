@@ -71,10 +71,11 @@ pyinstaller --onefile --windowed main.py
 
 ---
 
-## Run the docs
+## Build the docs
 
 ```bash 
 pip install mkdocs mkdocs-material mkdocstrings[python]
+mkdocs gh-deploy
 ```
 
 ---
