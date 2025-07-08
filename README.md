@@ -66,6 +66,13 @@ pip install pyinstaller
 
 pyinstaller --onefile --windowed main.py
 
+---
+
+## Run the docs
+
+```bash 
+pip install mkdocs mkdocs-material mkdocstrings[python]
+```
 
 ---
 
