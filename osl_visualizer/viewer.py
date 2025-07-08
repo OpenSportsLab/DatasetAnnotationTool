@@ -1,7 +1,7 @@
 import os
-import os
 import json
 import logging
+from datetime import datetime
 
 from PyQt6 import uic
 from PyQt6.QtWidgets import (
@@ -15,13 +15,14 @@ from PyQt6.QtGui import QShortcut, QKeySequence
 from models import VideoListModel, AnnotationListModel
 from dialogs import ConfigDialog, DownloaderDialog
 from utils import ms_to_time, ms_to_hms_ms
-from datetime import datetime
+
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s:%(message)s',
     handlers=[logging.StreamHandler()]
 )
+
 
 class StatusBarHandler(logging.Handler):
     def __init__(self, status_bar):
@@ -31,10 +32,12 @@ class StatusBarHandler(logging.Handler):
     def emit(self, record):
         msg = self.format(record)
         # Display message on status bar
-        self.status_bar.showMessage(msg, 5000)  # Display for 5 seconds (5000 ms)
+        self.status_bar.showMessage(msg, 5000)  # Display for 5 seconds
+
 
 class DatasetViewer(QMainWindow):
     """Main window for the OSL Dataset Visualizer application."""
+
     def __init__(self):
         super().__init__()
         uic.loadUi(os.path.join(os.path.dirname(__file__), "ui/mainwindow.ui"), self)
@@ -60,7 +63,7 @@ class DatasetViewer(QMainWindow):
         self.current_video_info = None
         self.jump_before_ms = 5000
         self.last_osl_dir = ""
-        self.is_modified = False # Track if the dataset has been modified
+        self.is_modified = False  # Track if the dataset has been modified
 
         # Multimedia
         self.player = QMediaPlayer(self)
@@ -166,13 +169,14 @@ class DatasetViewer(QMainWindow):
         self.current_video_info = None
         self.is_modified = False
         logging.info("Started a new OSL project.")
+
     # ---------- File Operations ----------
 
     def load_osl_json(self):
         """Open a file dialog to select and load an OSL JSON file."""
         file_path, _ = QFileDialog.getOpenFileName(self, "Open OSL JSON File", self.last_osl_dir, "JSON Files (*.json)")
         self.load_osl_json_from_file(file_path)
-        
+
     def load_osl_json_from_file(self, file_path):
         """Load OSL JSON data from the specified file path."""
         if file_path:
@@ -238,7 +242,6 @@ class DatasetViewer(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Error", f"Failed to save JSON: {e}")
             return False
-        
 
     # ---------- Model/View Selection ----------
 
@@ -353,7 +356,7 @@ class DatasetViewer(QMainWindow):
         self.current_video_info["annotations"] = self.annotationModel.annotations
         self.is_modified = True
         logging.info(f"Removed annotation at idx={idx}")
-    
+
     # ---------- Label Management ----------
 
     def add_label(self):
@@ -388,7 +391,6 @@ class DatasetViewer(QMainWindow):
         else:
             QMessageBox.warning(self, "Error", f"Label '{label}' not found.")
         self.is_modified = True
-
 
     # ---------- Video Files Management ----------
 
@@ -529,7 +531,7 @@ class DatasetViewer(QMainWindow):
 
     def open_downloader_dialog(self):
         dialog = DownloaderDialog(self)
-        dialog.exec()        
+        dialog.exec()
 
     # ---------- Settings Persistence ----------
 
@@ -554,7 +556,6 @@ class DatasetViewer(QMainWindow):
         except (TypeError, ValueError):
             self.jump_before_ms = 5000
         self.last_osl_dir = settings.value("last_osl_dir", "")
-
 
     # ---------- Close Event Handling ----------
 
@@ -591,7 +592,7 @@ class DatasetViewer(QMainWindow):
         else:  # Cancel
             event.ignore()
             return False
-        
+
     def closeEvent(self, event):
         if self.is_modified:
             if self.maybe_save_before_exit(event):
