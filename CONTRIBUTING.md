@@ -10,6 +10,8 @@ Thank you for considering contributing to this project!
 4. **Commit and push** your branch
 5. **Open a pull request** describing your changes
 
+**Note:** By submitting a pull request, you agree that your contribution will be licensed under the same license as this project.
+
 ## Code Style
 - Follow [PEP8](https://www.python.org/dev/peps/pep-0008/) for Python code
 - Write clear commit messages

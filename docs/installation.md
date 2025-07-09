@@ -1,8 +1,14 @@
 # Installation
 
+**Quick option:**
+
+Pre-built binaries for Windows, macOS, and Linux are available on the [GitHub Releases page](https://github.com/OpenSportsLab/DatasetAnnotationTool/releases). Download the latest release for your platform and run the executable—no installation required.
+
+---
+
 ## Requirements
 
-- Python 3.8 or later
+- Python 3.9 or later
 - PyQt6
 - Other dependencies (see `requirements.txt`)
 
@@ -14,20 +20,30 @@
     cd DatasetAnnotationTool
     ```
 
-2. **(Optional) Create a virtual environment:**
+2. **(Recommended) Create a Conda environment:**
     ```bash
-    python -m venv osl-visualizer
-    source osl-visualizer/bin/activate
+    conda create -n osl-visualizer python=3.9 -y
+    conda activate osl-visualizer
     ```
 
 3. **Install dependencies:**
+    The main dependencies are:
+    - pyqt6
+    - opencv-python (optional, for video rendering/computer vision)
+    - See `requirements.txt` for the full list
+    
+    Install with pip:
     ```bash
+    pip install pyqt6
+    # Optional, for video rendering/computer vision:
+    pip install opencv-python
+    # Or install all dependencies:
     pip install -r requirements.txt
     ```
 
 4. **Run the tool:**
     ```bash
-    python -m osl_visualizer.main
+    python osl_visualizer/main.py
     ```
 
 ## Troubleshooting
