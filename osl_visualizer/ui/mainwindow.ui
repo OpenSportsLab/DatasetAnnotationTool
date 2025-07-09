@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>883</width>
+    <width>894</width>
     <height>667</height>
    </rect>
   </property>
@@ -73,6 +73,12 @@
        <layout class="QVBoxLayout" name="centerLayout">
         <item>
          <widget class="QWidget" name="videoWidgetPlaceholder" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>320</width>
@@ -99,7 +105,7 @@
           <item>
            <widget class="QLabel" name="timeLabel">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -326,7 +332,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>883</width>
+     <width>894</width>
      <height>37</height>
     </rect>
    </property>
