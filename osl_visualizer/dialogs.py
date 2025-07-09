@@ -145,7 +145,7 @@ class DownloadThread(QThread):
             for allow_pattern in allow_patterns:
                 if self._stop_requested:
                     self.log_signal.emit("Download cancelled by user.")
-                    self.cancelled_signal.emit()
+                    self.finished_signal.emit()
                     return
                 self.log_signal.emit(f"Downloading {allow_pattern}...")
                 hf_hub_download(
