@@ -46,6 +46,8 @@ markdown_extensions:
       permalink: true
   - footnotes
   - tables
+  - pymdownx.superfences
+
 
 # Optional: If you want to deploy on GitHub Pages
 plugins:
